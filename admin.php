@@ -21,7 +21,7 @@ $recent_sales    = find_recent_sale_added('5')
 </div>
 </div>
 <div class="row">
-  <div class="col-12 col-md-2">
+  <div class="col-12 col-lg-2">
     <div class="col-12 shadow-sm">
       <div class="panel panel-box clearfix">
         <div class="panel-icon pull-CENTER text-center bg-info">
@@ -35,7 +35,7 @@ $recent_sales    = find_recent_sale_added('5')
     </div>
   </div>
   <!-- ultimas ventas -->
-  <div class="col-12 col-md-10">
+  <div class="col-12 col-lg-10">
     <div class="row">
       <div class="col-12">
         <div class="panel panel-default shadow-sm">

@@ -35,7 +35,7 @@ if (isset($_POST['add_cat'])) {
   </div>
 </div>
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-12 col-lg-5 mb-3">
     <div class="panel panel-default shadow-sm">
       <div class="panel-heading">
         <strong>
@@ -53,7 +53,7 @@ if (isset($_POST['add_cat'])) {
       </div>
     </div>
   </div>
-  <div class="col-md-7">
+  <div class=" col-12 col-lg-7">
     <div class="panel panel-default shadow-sm">
       <div class="panel-heading">
         <strong>

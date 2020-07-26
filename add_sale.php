@@ -25,19 +25,19 @@ if (isset($_POST['add_sale'])) {
     if ($db->query("SELECT quantity AS stock FROM products WHERE id = {$p_id}")) {
       $stock = $db->fetch_assoc($db->query_id)['stock'];
       if ($stock < $s_qty) {
-        $session->msg("d", "Stock insuficiente {$stock}");
+        $session->msg("d", "Stock insuficiente: {$stock}");
         redirect('add_sale.php', false);
-      }
-      return;
-    }
+      } else {
 
-    if ($db->query($sql)) {
-      update_product_qty($s_qty, $p_id);
-      $session->msg('s', "Venta agregada ");
-      redirect('add_sale.php', false);
-    } else {
-      $session->msg('d', 'Lo siento, registro falló.');
-      redirect('add_sale.php', false);
+        if ($db->query($sql)) {
+          update_product_qty($s_qty, $p_id);
+          $session->msg('s', "Venta agregada ");
+          redirect('add_sale.php', false);
+        } else {
+          $session->msg('d', 'Lo siento, registro falló.');
+          redirect('add_sale.php', false);
+        }
+      }
     }
   } else {
     $session->msg("d", $errors);

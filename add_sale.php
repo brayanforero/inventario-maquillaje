@@ -22,6 +22,15 @@ if (isset($_POST['add_sale'])) {
     $sql .= "'{$p_id}','{$s_qty}','{$s_total}','{$s_date}'";
     $sql .= ")";
 
+    if ($db->query("SELECT quantity AS stock FROM products WHERE id = {$p_id}")) {
+      $stock = $db->fetch_assoc($db->query_id)['stock'];
+      if ($stock < $s_qty) {
+        $session->msg("d", "Stock insuficiente {$stock}");
+        redirect('add_sale.php', false);
+      }
+      return;
+    }
+
     if ($db->query($sql)) {
       update_product_qty($s_qty, $p_id);
       $session->msg('s', "Venta agregada ");
@@ -39,6 +48,11 @@ if (isset($_POST['add_sale'])) {
 ?>
 <?php include_once('layouts/header.php'); ?>
 <div class="row">
+  <div class="col-12">
+    <div id="alert-stock" class="alert alert-info d-none text-center p-2">
+      <strong>Verificando inventario...</strong>
+    </div>
+  </div>
   <div class="col-md-6">
     <?php echo display_msg($msg); ?>
     <form method="post" action="ajax.php" autocomplete="off" id="sug-form">
@@ -60,12 +74,12 @@ if (isset($_POST['add_sale'])) {
     <div class="panel panel-default shadow-sm">
       <div class="panel-heading clearfix">
         <strong>
-          <span class="glyphicon glyphicon-th"></span>
+          <i class="fas fa-pen text-info h5 m-0 mr-1"></i>
           <span>Editar venta</span>
         </strong>
       </div>
       <div class="panel-body">
-        <form method="post" action="add_sale.php">
+        <form id="addSale" method="post" action="add_sale.php">
           <table class="table table-bordered">
             <thead>
               <th> Producto </th>
@@ -81,7 +95,5 @@ if (isset($_POST['add_sale'])) {
       </div>
     </div>
   </div>
-
 </div>
-
 <?php include_once('layouts/footer.php'); ?>

@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.1
--- http://www.phpmyadmin.net
+-- version 4.8.3
+-- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-06-2017 a las 07:12:59
--- Versión del servidor: 10.1.19-MariaDB
--- Versión de PHP: 7.0.13
+-- Tiempo de generación: 26-07-2020 a las 17:40:07
+-- Versión del servidor: 10.1.37-MariaDB
+-- Versión de PHP: 7.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -17,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `oswa_inv`
+-- Base de datos: `makeup`
 --
 
 -- --------------------------------------------------------
@@ -31,13 +33,6 @@ CREATE TABLE `categories` (
   `name` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Volcado de datos para la tabla `categories`
---
-
-INSERT INTO `categories` (`id`, `name`) VALUES
-(1, 'Repuestos');
-
 -- --------------------------------------------------------
 
 --
@@ -49,13 +44,6 @@ CREATE TABLE `media` (
   `file_name` varchar(255) NOT NULL,
   `file_type` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `media`
---
-
-INSERT INTO `media` (`id`, `file_name`, `file_type`) VALUES
-(1, 'filter.jpg', 'image/jpeg');
 
 -- --------------------------------------------------------
 
@@ -74,13 +62,6 @@ CREATE TABLE `products` (
   `date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Volcado de datos para la tabla `products`
---
-
-INSERT INTO `products` (`id`, `name`, `quantity`, `buy_price`, `sale_price`, `categorie_id`, `media_id`, `date`) VALUES
-(1, 'Filtro de gasolina', '100', '5.00', '10.00', 1, 1, '2017-06-16 07:03:16');
-
 -- --------------------------------------------------------
 
 --
@@ -94,6 +75,22 @@ CREATE TABLE `sales` (
   `price` decimal(25,2) NOT NULL,
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Disparadores `sales`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_sales_BI` BEFORE INSERT ON `sales` FOR EACH ROW BEGIN
+        DECLARE cantidad INT;
+        
+        SET cantidad = (SELECT quantity FROM products WHERE id = NEW.product_id);
+        
+        IF cantidad = 0 OR cantidad < NEW.qty THEN
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Stock Insuficiente';
+		END IF;        
+    END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -117,9 +114,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `username`, `password`, `user_level`, `image`, `status`, `last_login`) VALUES
-(1, 'Admin Users', 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1, 'pzg9wa7o1.jpg', 1, '2017-06-16 07:11:11'),
-(2, 'Special User', 'special', 'ba36b97a41e7faf742ab09bf88405ac04f99599a', 2, 'no_image.jpg', 1, '2017-06-16 07:11:26'),
-(3, 'Default User', 'user', '12dea96fec20593566ab75692c9949596833adc9', 3, 'no_image.jpg', 1, '2017-06-16 07:11:03');
+(1, 'Kathy La Cruz', 'admin', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 1, 'pzg9wa7o1.jpg', 1, '2020-07-26 00:00:00'),
+(2, 'Special User', 'special', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 2, 'no_image.jpg', 1, '2020-07-26 00:00:00'),
+(3, 'Default User', 'user', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 3, 'no_image.jpg', 1, '2020-07-26 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -140,7 +137,7 @@ CREATE TABLE `user_groups` (
 
 INSERT INTO `user_groups` (`id`, `group_name`, `group_level`, `group_status`) VALUES
 (1, 'Admin', 1, 1),
-(2, 'Special', 2, 0),
+(2, 'Special', 2, 1),
 (3, 'User', 3, 1);
 
 --
@@ -200,32 +197,38 @@ ALTER TABLE `user_groups`
 -- AUTO_INCREMENT de la tabla `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT de la tabla `media`
 --
 ALTER TABLE `media`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT de la tabla `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT de la tabla `sales`
 --
 ALTER TABLE `sales`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- AUTO_INCREMENT de la tabla `user_groups`
 --
 ALTER TABLE `user_groups`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -247,6 +250,7 @@ ALTER TABLE `sales`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `FK_user` FOREIGN KEY (`user_level`) REFERENCES `user_groups` (`group_level`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

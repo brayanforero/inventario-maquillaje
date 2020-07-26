@@ -25,7 +25,7 @@
 <body>
   <?php if ($session->isUserLoggedIn(true)) : ?>
     <header class="d-flex justify-content-between aling-items-center" id="header">
-      <h1 class="m-0">SIS-MAKEUP</h1>
+      <h1 class="m-0 p-2">SIS-MAKEUP</h1>
       <div class="header-content d-flex justify-content-between aling-items-center">
         <div class="header-date pull-left">
           <strong><?= 'Fecha: ' . date("d/m/Y") ?></strong>
